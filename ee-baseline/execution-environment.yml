@@ -1,0 +1,15 @@
+---
+version: 3
+
+images:
+  base_image:
+    name: registry.fedoraproject.org/fedora:38
+
+build_arg_defaults:
+  ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-vvv'
+  
+dependencies:
+  ansible_core:
+    package_pip: ansible-core
+  ansible_runner:
+    package_pip: ansible-runner
