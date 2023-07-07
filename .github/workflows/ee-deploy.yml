@@ -5,7 +5,7 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - users: actions/checkout@v3
+            - uses: actions/checkout@v3
             - name: run a one liner
               run: echo OHAI
             - name: run a multi liner
