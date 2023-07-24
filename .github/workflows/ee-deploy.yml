@@ -26,7 +26,7 @@ jobs:
 
             - name: Prepare baseline execution environment config
               run: |
-                cat > ~/${EE_BASELINE_IMAGE_NAME} <<EOF
+                cat > ~/${EE_BASELINE_IMAGE_NAME}.yml <<EOF
                   version: 3
                 
                   images:
