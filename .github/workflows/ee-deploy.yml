@@ -81,12 +81,15 @@ jobs:
                 collections:
                   - azure.azcollection
           
-            additional_build_steps:
-              prepend_final: |
-                RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc
-                RUN dnf install -y https://packages.microsoft.com/config/fedora/38/packages-microsoft-prod.rpm
-                RUN dnf -y install azure-cli
+
           EOF
+
+      # additional_build_steps:
+      #   prepend_final: |
+      #     RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc
+      #     RUN dnf install -y https://packages.microsoft.com/config/fedora/38/packages-microsoft-prod.rpm
+      #     RUN dnf -y install azure-cli
+
 
       - name: Build azure execution environment image
         run: |
