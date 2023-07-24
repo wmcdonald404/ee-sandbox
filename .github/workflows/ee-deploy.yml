@@ -8,58 +8,100 @@ env:
   EE_AZURE_IMAGE_NAME: ee-azure
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-            - name: Log in to registry
-              run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY_URL} -u $ --password-stdin
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY_URL} -u $ --password-stdin
 
-            - name: Install ansible-builder python requirements
-              run: |
-                mkdir -p ~/venv/ee
-                python3 -m venv ~/venv/ee/
-                . ~/venv/ee/bin/activate
-                python3 -m pip install --upgrade pip
-                pip install ansible-builder
+      - name: Install ansible-builder python requirements
+        run: |
+          mkdir -p ~/venv/ee
+          python3 -m venv ~/venv/ee/
+          . ~/venv/ee/bin/activate
+          python3 -m pip install --upgrade pip
+          pip install ansible-builder
 
-            - name: Prepare baseline execution environment config
-              run: |
-                cat > ~/${EE_BASELINE_IMAGE_NAME}.yml <<EOF
-                  version: 3
-                
-                  images:
-                    base_image:
-                      name: registry.fedoraproject.org/fedora:38
-                
-                  build_arg_defaults:
-                    ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-vvv'
-                
-                  dependencies:
-                    ansible_core:
-                      package_pip: ansible-core
-                    ansible_runner:
-                      package_pip: ansible-runner
-                EOF
+      - name: Prepare baseline execution environment config
+        run: |
+          cat > ~/${EE_BASELINE_IMAGE_NAME}.yml <<EOF
+            version: 3
+          
+            images:
+              base_image:
+                name: registry.fedoraproject.org/fedora:38
+          
+            build_arg_defaults:
+              ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-vvv'
+          
+            dependencies:
+              ansible_core:
+                package_pip: ansible-core
+              ansible_runner:
+                package_pip: ansible-runner
+          EOF
 
-            - name: Build baseline execution environment image
-              run: |
-                . ~/venv/ee/bin/activate
-                ansible-builder build -f ~/${EE_BASELINE_IMAGE_NAME}.yml -t ${EE_BASELINE_IMAGE_NAME} -v3 --container-runtime docker
+      - name: Build baseline execution environment image
+        run: |
+          . ~/venv/ee/bin/activate
+          ansible-builder build -f ~/${EE_BASELINE_IMAGE_NAME}.yml -t ${EE_BASELINE_IMAGE_NAME} -v3 --container-runtime docker
 
-            - name: Push baseline execution environment image
-              run: |
-                IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${EE_BASELINE_IMAGE_NAME}
-                IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-                VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-                [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-                [ "$VERSION" == "main" ] && VERSION=latest
-                echo IMAGE_ID=$IMAGE_ID
-                echo VERSION=$VERSION
-                docker tag $EE_BASELINE_IMAGE_NAME $IMAGE_ID:$VERSION
-                docker push $IMAGE_ID:$VERSION
+      - name: Push baseline execution environment image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${EE_BASELINE_IMAGE_NAME}
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [ "$VERSION" == "main" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $EE_BASELINE_IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
 
-              # docker tag ${{ env.EE_BASELINE_IMAGE_NAME}} ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
-              # docker push ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
+      - name: Prepare Azure execution environment config
+        run: |
+          cat > ~/${EE_AZURE_IMAGE_NAME}.yml <<EOF
+            version: 3
+          
+            images:
+              base_image:
+                name: ghcr.io/${{ github.repository_owner }}/${EE_BASELINE_IMAGE_NAME}:latest
+          
+            build_arg_defaults:
+              ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-vvv'
+          
+            dependencies:
+              ansible_core:
+                package_pip: ansible-core
+              ansible_runner:
+                package_pip: ansible-runner
+              galaxy:
+                collections:
+                  - azure.azcollection
+          
+            additional_build_steps:
+              prepend_final: |
+                RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc
+                RUN dnf install -y https://packages.microsoft.com/config/fedora/38/packages-microsoft-prod.rpm
+                RUN dnf -y install azure-cli
+          EOF
+
+      - name: Build azure execution environment image
+        run: |
+          . ~/venv/ee/bin/activate
+          ansible-builder build -f ~/${EE_AZURE_IMAGE_NAME}.yml -t ${EE_AZURE_IMAGE_NAME} -v3 --container-runtime docker
+
+      - name: Push Azure execution environment image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${EE_AZURE_IMAGE_NAME}
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [ "$VERSION" == "main" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $EE_AZURE_IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION          
                   
