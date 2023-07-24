@@ -7,43 +7,66 @@ Run from Ubuntu 22.04 (running on WSL2).
 Fedora, CentOS Stream or RHEL UBI required for EEs.
 
 - Update the apt cache
+```
 $ sudo apt-get update
+```
 
 - Install Python prequisites
+```
 $ sudo apt install python3 python3-pip3 python3-venv
+```
 
 - Install Podman as the container runtime
+```
 $ sudo apt install podman
+```
 
 - Create a Python virtual environment (venv)
+```
 $ mkdir -p ~/venv/ee
 $ python3 -m venv ~/venv/ee/
+```
 
 - Activate the Python venv
+```
 $ . ~/venv/ee/bin/activate
+```
 
 - Upgrade pip
+```
 $ python3 -m pip install --upgrade pip
+```
 
 - Install Ansible and its execution environment tooling
+```
 $ pip install ansible ansible-builder ansible-runner ansible-navigator
+```
 
 - Snapshot the packages for future reference
+```
 $ pip freeze > ~/repos/ee-sandbox/ansible-base-packages.txt
+```
 
 - Grab a base container (`ansible-builder` will do this for us, this is just in case we want to spin it up beforehand to validate contents.)
+
+```
 $ podman pull registry.fedoraproject.org/fedora:38
+```
 
 - Invoke a container and attach to it
+```
 $ podman run -dit --name fedora-demo fedora:38
 $ podman attach fedora-demo
+```
 
 (CTRL-P, CTRL-Q to detach and leave running.)
 
 ## Execution environment prep
 
 - Create a directory
+```
 $ mkdir -p ~/ee-sandbox/ee-baseline
+```
 
 - Create an execution environment definition
 ```
@@ -67,9 +90,12 @@ EOF
 ```
 
 - Build an execution environment
+```
 $ ansible-builder build -f ~/repos/ee-sandbox/ee-baseline/execution-environment.yml -t ee-baseline:latest -v3
+```
 
 - Test the execution environment
+
 ```
 $ podman run --rm -it ee-baseline
 bash-5.2$ ansible --version
