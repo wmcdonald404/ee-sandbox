@@ -4,6 +4,9 @@ on:
 
 env:
   CONTAINER_REGISTRY_URL: ghcr.io
+  EE_BASELINE_IMAGE_NAME: ee-baseline
+  EE_AZURE_IMAGE_NAME: ee-azure
+
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -11,7 +14,7 @@ jobs:
             - uses: actions/checkout@v3
 
             - name: Log in to registry
-              run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.CONTAINER_REGISTRY_URL }} -u $ --password-stdin
+              run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY_URL} -u $ --password-stdin
 
             - name: Install ansible-builder python requirements
               run: |
@@ -23,7 +26,7 @@ jobs:
 
             - name: Prepare baseline execution environment config
               run: |
-                cat > ~/baseline-execution-environment.yml <<EOF
+                cat > ~/${EE_BASELINE_IMAGE_NAME} <<EOF
                   version: 3
                 
                   images:
@@ -43,10 +46,20 @@ jobs:
             - name: Build baseline execution environment image
               run: |
                 . ~/venv/ee/bin/activate
-                ansible-builder build -f ~/baseline-execution-environment.yml -t ee-baseline:latest -v3 --container-runtime docker
+                ansible-builder build -f ~/${EE_BASELINE_IMAGE_NAME}.yml -t ${EE_BASELINE_IMAGE_NAME} -v3 --container-runtime docker
 
             - name: Push baseline execution environment image
               run: |
-                docker tag ee-baseline:latest ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
-                docker push ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
+                IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${EE_BASELINE_IMAGE_NAME}
+                IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+                VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+                [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+                [ "$VERSION" == "main" ] && VERSION=latest
+                echo IMAGE_ID=$IMAGE_ID
+                echo VERSION=$VERSION
+                docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+                docker push $IMAGE_ID:$VERSION
+
+              # docker tag ${{ env.EE_BASELINE_IMAGE_NAME}} ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
+              # docker push ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
                   
