@@ -1,15 +1,52 @@
 name: Create Ansible execution environment
 on: 
     workflow_dispatch
+
+env:
+  CONTAINER_REGISTRY_URL: ghcr.io
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-            - name: run a one liner
-              run: echo OHAI
-            - name: run a multi liner
+
+            - name: Log in to registry
+              run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.CONTAINER_REGISTRY_URL }} -u $ --password-stdin
+
+            - name: Install ansible-builder python requirements
               run: |
-                echo testing, testing
-                echo one-ah, two-ah
-  
+                mkdir -p ~/venv/ee
+                python3 -m venv ~/venv/ee/
+                . ~/venv/ee/bin/activate
+                python3 -m pip install --upgrade pip
+                pip install ansible-builder
+
+            - name: Prepare baseline execution environment config
+              run: |
+                cat > ~/baseline-execution-environment.yml <<EOF
+                  version: 3
+                
+                  images:
+                    base_image:
+                      name: registry.fedoraproject.org/fedora:38
+                
+                  build_arg_defaults:
+                    ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-vvv'
+                
+                  dependencies:
+                    ansible_core:
+                      package_pip: ansible-core
+                    ansible_runner:
+                      package_pip: ansible-runner
+                EOF
+
+            - name: Build baseline execution environment image
+              run: |
+                . ~/venv/ee/bin/activate
+                ansible-builder build -f ~/baseline-execution-environment.yml -t ee-baseline:latest -v3 --container-runtime docker
+
+            - name: Push baseline execution environment image
+              run: |
+                docker tag ee-baseline:latest ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
+                docker push ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
+                  
