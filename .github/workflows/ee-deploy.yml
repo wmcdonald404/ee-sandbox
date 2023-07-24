@@ -57,7 +57,7 @@ jobs:
                 [ "$VERSION" == "main" ] && VERSION=latest
                 echo IMAGE_ID=$IMAGE_ID
                 echo VERSION=$VERSION
-                docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+                docker tag $EE_BASELINE_IMAGE_NAME $IMAGE_ID:$VERSION
                 docker push $IMAGE_ID:$VERSION
 
               # docker tag ${{ env.EE_BASELINE_IMAGE_NAME}} ${{ env.CONTAINER_REGISTRY_URL }}/ansible/ee-baseline:latest
