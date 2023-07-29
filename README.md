@@ -1,11 +1,13 @@
 # ee-sandbox
 Messing about with Ansible Execution Environments and Github Actions. 
+
 This is intended to outline the process to:
 1. Prepare an environment to run `ansible-builder` in order to...
 2. First build a baseline execution environment (EE) with the bare minimum `ansible-core` and `ansible-runner` and then...
 3. Then build an Azure-specific EE on top of that baseline, with the `azure.azcollection` and `azure-cli` in order to provide a suitable environment for `ansible-runner` targeting Azure 
 4. Test `ansible-runner` invoking the execution environment
 5. Wrap the process into a Github actions (GHA) pipeline
+
 First we'll walk through the manual steps, end-to-end, to understand the process to automate. Then we'll demonstrate the same workflow but in an automated GHA pipeline.  
 ## Ubuntu Setup
 First setup a build environment. This is running on Ubuntu 22.04 running on WSL2 for convenience, but should be easily modifiable for other environments. `ansible-builder` requires an RPM-based container image like Fedora, CentOS Stream or RHEL UBI in order to build its EEs.
@@ -38,16 +40,16 @@ $ python3 -m pip install --upgrade pip
 ```
 $ pip install ansible ansible-builder ansible-runner ansible-navigator
 ```
-nb: only `ansible-builder` is **required** here but it's useful to have the other components in the local Python venv for reference.
+***Note:*** only `ansible-builder` is **required** here but it's useful to have the other components in the local Python venv for reference.
 - Grab a base container (`ansible-builder` will do this automatically, this is just in case it proves useful to spin container instances in advance to validate contents and/or behaviour.)
 ```
 $ podman pull registry.fedoraproject.org/fedora:38
 ```
 - Invoke a container to test
 ```
-$ podman run -it --name fedora-demo fedora:38
+$ podman run --rm -it --name fedora-demo fedora:38
 ```
-(If running the container with `-dit`, CTRL-P, CTRL-Q to detach and leave running.)
+(If running the container with `-dit`, `podman attach <container-id>`, CTRL-P, CTRL-Q to detach and leave running if needed.)
 
 ## Manual Baseline Execution Environment Preparation
 These manual steps are now baked into the pipeline in .github/workflows/ee-deploy.yml and will execute self-contained in the Github Action runner when triggered.
@@ -122,7 +124,7 @@ ansible.builtin.apt_repository         Add and remove APT repositories
 Note that only ansible.builtin core modules are currently installed. The execution environment will need additional collections to be more useful.
 At this stage, we can push the build container image to a registry, or build on top of it with additional collections to create purpose-specific execution environments (Azure, AWS, or GCP specific EEs, for example.)
 ## Github Action Baseline Execution Environment Preparation
-Now we understand the manual process, we can wrap this into a Github Actions workflow. [The workflow](https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-deploy.yml#L19-L105) currently runs a job 'build' which includes the steps below:
+Now we understand the manual process, we can wrap this into a Github Actions workflow. [The workflow](https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml) currently runs a job 'ee-build' which includes the steps below:
 - name: Install ansible-builder python requirements
 - name: Prepare baseline execution environment config
 - name: Build baseline execution environment image
@@ -144,19 +146,21 @@ az account set -s <subscription-id>
 ```
 az ad app create --display-name aad-app-github-actions-oidc
 ```
-*note* the "appId" returned in the JSON as your <app-client-id>
-*note* the "id" returned in the JSON as your <app-object-id>
+***Note*** the "appId" returned in the JSON as your `<app-client-id>`
+
+***Note*** the "id" returned in the JSON as your `<app-object-id>`
 - Create a service principal for the Azure AD application
 ```
 az ad sp create --id <app-client-id>
 ```
-*note* the "id" returned in the JSON as your <sp-id>
-*note* the "appOwnerOrganizationId" as your <tenant-id>
+***Note*** the "id" returned in the JSON as your `<sp-id>`
+
+***Note*** the "appOwnerOrganizationId" as your `<tenant-id>`
 - Assign the contributor role to the service principal for the subscription
 ```
 az role assignment create --role contributor --subscription <subscription-id> --assignee-object-id  <sp-id> --assignee-principal-type ServicePrincipal --scope /subscriptions/<subscription-id>
 ```
-*note* the upstream example demonstrates limiting the scope for this role to a specific resource group
+***Note*** the upstream example demonstrates limiting the scope for this role to a specific resource group
 ### Add federated credentials
 - Set some temporary environment variables
 ```
