@@ -141,13 +141,90 @@ Now we understand the manual process, we can wrap this into a Github Actions wor
 - name: Build azure execution environment image
 - name: Push Azure execution environment image
 
-
+## Azure OIDC Preparation for Github Action 
+### Create an Azure AD application and service principal
+- Log in to Azure
+```
+az login
+```
+- Set a default subscription
+```
+az account set -s <subscription-id>
+```
+- Create an Azure AD application registration
+```
+az ad app create --display-name aad-app-github-actions-oidc
+```
+*note* the "appId" returned in the JSON as your <app-client-id>
+*note* the "id" returned in the JSON as your <app-object-id>
+- Create a service principal for the Azure AD application
+```
+az ad sp create --id <app-client-id>
+```
+*note* the "id" returned in the JSON as your <sp-id>
+*note* the "appOwnerOrganizationId" as your <tenant-id>
+- Assign the contributor role to the service principal for the subscription
+```
+az role assignment create --role contributor --subscription <subscription-id> --assignee-object-id  <sp-id> --assignee-principal-type ServicePrincipal --scope /subscriptions/<subscription-id>
+```
+*note* the upstream example demonstrates limiting the scope for this role to a specific resource group
+### Add federated credentials
+- Set some temporary environment variables
+```
+export APPLICATION-OBJECT-ID=<app-object-id>
+export CRED_NAME=aad-app-github-actions-oidc-fcred
+export SUBJECT=repo:wmcdonald404/ee-sandbox:environment:test
+```
+- Create JSON for the federated credential creation parameters
+```
+cat > ~/credentials.json <<EOF
+{
+    "name": "${CRED_NAME}",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "${SUBJECT}",
+    "description": "Github Action Test Federated Credential",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+}
+EOF
+```
+- Create the federated credential
+```
+az ad app federated-credential create --id <app-object-id> --parameters credential.json
+```
+### Create Github Environment & Secrets
+- Set the default repository for the Github CLI
+```
+export GH_REPO=wmcdonald404/ee-sandbox
+```
+- Create the test Github deployment environment
+```
+gh api -X PUT /repos/wmcdonald404/ee-sandbox/environments/test 
+```
+- Create the secrets needed for OIDC-based authentication
+```
+gh secret set AZURE_CLIENT_ID -e test -a actions -b <client-id>
+gh secret set AZURE_TENANT_ID -e test -a actions -b <app-tenant-id>
+gh secret set AZURE_SUBSCRIPTION_ID -e test -a actions -b <subscription-id>
+```
 
 # References
 
+## Execution Environment References
 - https://ansible.readthedocs.io/projects/navigator/installation/#requirements-windows
 - https://www.ansible.com/blog/automating-execution-environment-image-builds-with-github-actions
 - https://github.com/cloin/ee-builds
+
+## Github Actions for Azure References
+- https://github.com/marketplace/actions/azure-login
+- https://github.com/marketplace/actions/azure-login#configure-a-federated-credential-to-use-oidc-based-authentication
+- https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux
+- https://learn.microsoft.com/en-us/azure/active-directory/workload-identities/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions
+
+## Github REST API and CLI
+- https://docs.github.com/en/rest/deployments/environments?apiVersion=2022-11-28
+- https://cli.github.com/manual/gh
 
 Install Python poetry since `pip search` no longer works.
 See: https://stackoverflow.com/questions/17373473/how-do-i-search-for-an-available-python-package-using-pip

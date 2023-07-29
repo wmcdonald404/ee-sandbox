@@ -1,4 +1,5 @@
 name: Create Ansible execution environment
+
 on: 
     workflow_dispatch
 
@@ -8,7 +9,7 @@ env:
   EE_AZURE_IMAGE_NAME: ee-azure
 
 jobs:
-  build:
+  build-execution-environments:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
