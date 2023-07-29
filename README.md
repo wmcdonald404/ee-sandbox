@@ -132,8 +132,8 @@ Now we understand the manual process, we can wrap this into a Github Actions wor
 - name: Prepare Azure execution environment config
 - name: Build azure execution environment image
 - name: Push Azure execution environment image
-## Azure OIDC Preparation for Github Action 
-### Create an Azure AD application and service principal
+## Azure OIDC Preparation for Github Actions
+### Create an Azure AD Application and Service Principal
 - Log in to Azure
 ```
 az login
@@ -161,7 +161,7 @@ az ad sp create --id <app-client-id>
 az role assignment create --role contributor --subscription <subscription-id> --assignee-object-id  <sp-id> --assignee-principal-type ServicePrincipal --scope /subscriptions/<subscription-id>
 ```
 ***Note*** the upstream example demonstrates limiting the scope for this role to a specific resource group
-### Add federated credentials
+### Add Federated Credentials
 - Set some temporary environment variables
 ```
 export APPLICATION-OBJECT-ID=<app-object-id>
