@@ -1,19 +1,14 @@
 # ee-sandbox
 Messing about with Ansible Execution Environments and Github Actions. 
-
 This is intended to outline the process to:
-
 1. Prepare an environment to run `ansible-builder` in order to...
 2. First build a baseline execution environment (EE) with the bare minimum `ansible-core` and `ansible-runner` and then...
 3. Then build an Azure-specific EE on top of that baseline, with the `azure.azcollection` and `azure-cli` in order to provide a suitable environment for `ansible-runner` targeting Azure 
 4. Test `ansible-runner` invoking the execution environment
 5. Wrap the process into a Github actions (GHA) pipeline
-
 First we'll walk through the manual steps, end-to-end, to understand the process to automate. Then we'll demonstrate the same workflow but in an automated GHA pipeline.  
-
 ## Ubuntu Setup
 First setup a build environment. This is running on Ubuntu 22.04 running on WSL2 for convenience, but should be easily modifiable for other environments. `ansible-builder` requires an RPM-based container image like Fedora, CentOS Stream or RHEL UBI in order to build its EEs.
-
 - Update the apt cache
 ```
 $ sudo apt-get update
@@ -44,7 +39,6 @@ $ python3 -m pip install --upgrade pip
 $ pip install ansible ansible-builder ansible-runner ansible-navigator
 ```
 nb: only `ansible-builder` is **required** here but it's useful to have the other components in the local Python venv for reference.
-
 - Grab a base container (`ansible-builder` will do this automatically, this is just in case it proves useful to spin container instances in advance to validate contents and/or behaviour.)
 ```
 $ podman pull registry.fedoraproject.org/fedora:38
@@ -126,13 +120,9 @@ ansible.builtin.apt_repository         Add and remove APT repositories
 <snipped for clarity>
 ```
 Note that only ansible.builtin core modules are currently installed. The execution environment will need additional collections to be more useful.
-
 At this stage, we can push the build container image to a registry, or build on top of it with additional collections to create purpose-specific execution environments (Azure, AWS, or GCP specific EEs, for example.)
-
 ## Github Action Baseline Execution Environment Preparation
-
 Now we understand the manual process, we can wrap this into a Github Actions workflow. [The workflow](https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-deploy.yml#L19-L105) currently runs a job 'build' which includes the steps below:
-
 - name: Install ansible-builder python requirements
 - name: Prepare baseline execution environment config
 - name: Build baseline execution environment image
@@ -140,7 +130,6 @@ Now we understand the manual process, we can wrap this into a Github Actions wor
 - name: Prepare Azure execution environment config
 - name: Build azure execution environment image
 - name: Push Azure execution environment image
-
 ## Azure OIDC Preparation for Github Action 
 ### Create an Azure AD application and service principal
 - Log in to Azure
@@ -208,38 +197,29 @@ gh secret set AZURE_CLIENT_ID -e test -a actions -b <client-id>
 gh secret set AZURE_TENANT_ID -e test -a actions -b <app-tenant-id>
 gh secret set AZURE_SUBSCRIPTION_ID -e test -a actions -b <subscription-id>
 ```
-
 # References
-
 ## Execution Environment References
 - https://ansible.readthedocs.io/projects/navigator/installation/#requirements-windows
 - https://www.ansible.com/blog/automating-execution-environment-image-builds-with-github-actions
 - https://github.com/cloin/ee-builds
-
 ## Github Actions for Azure References
 - https://github.com/marketplace/actions/azure-login
 - https://github.com/marketplace/actions/azure-login#configure-a-federated-credential-to-use-oidc-based-authentication
 - https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux
 - https://learn.microsoft.com/en-us/azure/active-directory/workload-identities/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions
-
 ## Github REST API and CLI
 - https://docs.github.com/en/rest/deployments/environments?apiVersion=2022-11-28
 - https://cli.github.com/manual/gh
-
-Install Python poetry since `pip search` no longer works.
-See: https://stackoverflow.com/questions/17373473/how-do-i-search-for-an-available-python-package-using-pip
-$ sudo apt install python3-poetry
-
-
 # Notes
-
 - "Here documents" in Github Actions are very particular about trailing whitespace for the end token.
 - Pay careful attention to the execution environment schema version. Copying v1 examples for a v3 install will cause confusion.
-
-
 # Documentation Snippets
-
 - Snapshot the packages for future reference
 ```
 $ pip freeze > ~/repos/ee-sandbox/ansible-base-packages.txt
+```
+- Install Python poetry since `pip search` no longer works.
+```
+See: https://stackoverflow.com/questions/17373473/how-do-i-search-for-an-available-python-package-using-pip
+$ sudo apt install python3-poetry
 ```
