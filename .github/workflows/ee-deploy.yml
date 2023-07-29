@@ -28,14 +28,11 @@ jobs:
         run: |
           cat > ~/${EE_BASELINE_IMAGE_NAME}.yml <<EOF
             version: 3
-          
             images:
               base_image:
                 name: registry.fedoraproject.org/fedora:38
-          
             build_arg_defaults:
               ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-vvv'
-          
             dependencies:
               ansible_core:
                 package_pip: ansible-core
@@ -64,14 +61,11 @@ jobs:
         run: |
           cat > ~/${EE_AZURE_IMAGE_NAME}.yml <<EOF
             version: 3
-          
             images:
               base_image:
                 name: ghcr.io/${{ github.repository_owner }}/${EE_BASELINE_IMAGE_NAME}:latest
-          
             build_arg_defaults:
               ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-vvv'
-          
             dependencies:
               ansible_core:
                 package_pip: ansible-core
