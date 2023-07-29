@@ -28,25 +28,19 @@ jobs:
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY_URL} -u $ --password-stdin
-
-      - name: 'Run Azure CLI commands'
-        run: |
-            az account show
-            az group list
-            pwd
       
       - name: Construct & check the inventory
         run: |
-          mkdir -p ${MACHINE_ROLE}/inventory/
-          cat > ${MACHINE_ROLE}/inventory/azure_rm.yml <<EOF
+          mkdir -p ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/inventory/
+          cat > ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/inventory/azure_rm.yml <<EOF
           plugin: azure.azcollection.azure_rm
           auth_source: auto
           EOF
 
       - name: Construct & check the playbook
         run: |
-          mkdir -p ${MACHINE_ROLE}/project/
-          cat > ${MACHINE_ROLE}/project/playbook.yml <<EOF
+          mkdir -p ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/project/
+          cat > ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/project/playbook.yml <<EOF
           - name: Testing Ansible SSH connectivity
             hosts: all
 
@@ -57,6 +51,6 @@ jobs:
 
       - name: Test run the Azure execution environment image
         run: |
-          docker run --rm -u root -v ${PWD}/${MACHINE_ROLE}:/runner -v /home/runner/.azure/:/root/.azure/ -e RUNNER_PLAYBOOK=playbook.yml -e ANSIBLE_INVENTORY=/runner/inventory ${CONTAINER_REGISTRY_URL}/ansible/${EE_AZURE_IMAGE_NAME} ansible-inventory --graph
+          docker run --rm -u root -v ${GITHUB_WORKSPACE}/${MACHINE_ROLE}:/runner -v ${GITHUB_WORKSPACE}/.azure/:/root/.azure/ -e RUNNER_PLAYBOOK=playbook.yml -e ANSIBLE_INVENTORY=/runner/inventory ${CONTAINER_REGISTRY_URL}/${GITHUB_ACTOR}/${EE_AZURE_IMAGE_NAME} ansible-inventory --graph
       
       # docker run --rm -u root -v ${PWD}/${MACHINE_ROLE}:/runner -v /home/runner/.azure/:/root/.azure/ -e RUNNER_PLAYBOOK=playbook.yml -e ANSIBLE_INVENTORY=/runner/inventory ${CONTAINER_REGISTRY_URL}/ansible/${EE_AZURE_IMAGE_NAME} ansible-runner run /runner
