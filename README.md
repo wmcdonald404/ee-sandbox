@@ -139,6 +139,8 @@ Now we understand the manual process, we can wrap this into a Github Actions wor
 - name: Push baseline execution environment image
 - name: Prepare Azure execution environment config
 - name: Build azure execution environment image
+- name: Push Azure execution environment image
+
 
 
 # References
