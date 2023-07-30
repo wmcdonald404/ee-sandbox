@@ -232,7 +232,7 @@ $ gh workflow run ee-run.yml
 $ gh workflow run 64655927
 ```
 - Watch the workflow execute
-  - `gh run watch` will automatically watch the most recent run
+  - `gh run watch` will list current runs and allow interactive selection
   - `gh run list` and then `gh run watch <run-id>` will watch a specific run
 ```
 gh run watch
