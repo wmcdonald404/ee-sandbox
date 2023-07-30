@@ -15,7 +15,7 @@ jobs:
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY_URL} -u $ --password-stdin
 
-      - name: Install ansible-builder python requirements
+      - name: Install ansible-builder Python requirements
         run: |
           mkdir -p ${GITHUB_WORKSPACE}/ee
           python3 -m venv ${GITHUB_WORKSPACE}/ee
@@ -23,7 +23,7 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install ansible-builder
 
-      - name: Prepare baseline execution environment config
+      - name: Prepare Baseline Execution Environment config
         run: |
           cat > ${GITHUB_WORKSPACE}/${EE_BASELINE_IMAGE_NAME}.yml <<EOF
             version: 3
@@ -39,11 +39,11 @@ jobs:
                 package_pip: ansible-runner
           EOF
 
-      - name: Build baseline execution environment image
+      - name: Build Baseline Execution Environment image
         run: |
           ansible-builder build -f ${GITHUB_WORKSPACE}/${EE_BASELINE_IMAGE_NAME}.yml -t ${EE_BASELINE_IMAGE_NAME} -v3 --container-runtime docker
 
-      - name: Push baseline execution environment image
+      - name: Push Baseline Execution Environment image
         run: |
           IMAGE_ID=ghcr.io/${GITHUB_REPOSITORY_OWNER}/${EE_BASELINE_IMAGE_NAME}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -55,7 +55,7 @@ jobs:
           docker tag $EE_BASELINE_IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-      - name: Prepare Azure execution environment config
+      - name: Prepare Azure Execution Environment config
         run: |
           cat > ${GITHUB_WORKSPACE}/${EE_AZURE_IMAGE_NAME}.yml <<EOF
             version: 3
@@ -79,7 +79,7 @@ jobs:
                 RUN dnf -y install azure-cli                       
           EOF
 
-      - name: Build azure execution environment image
+      - name: Build Azure Execution Environment image
         run: |
           ansible-builder build -f ${GITHUB_WORKSPACE}/${EE_AZURE_IMAGE_NAME}.yml -t ${EE_AZURE_IMAGE_NAME} -v3 --container-runtime docker
 

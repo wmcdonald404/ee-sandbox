@@ -125,22 +125,22 @@ Note that only ansible.builtin core modules are currently installed. The executi
 At this stage, we can push the build container image to a registry, or build on top of it with additional collections to create purpose-specific execution environments (Azure, AWS, or GCP specific EEs, for example.)
 
 ## Github Action Execution Environments Preparation & Build
-Now we understand the manual process, we can wrap this into a Github Actions workflow. [The workflow](https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml) currently runs a job 'ee-build' which can be broken down into:
+Now we understand the manual process, we can wrap this into a Github Actions workflow. [The workflow](https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml) currently runs a job `ee-build` which can be broken down into:
 ### Github Action Common Preamble & Prerequisites
 - name: Log in to registry
-- name: Install ansible-builder python requirements
+- name: Install ansible-builder Python requirements
 
-See: https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml#L18-L24
+See: https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml#L15-L24
 ### Github Action Baseline EE Prep, Build, Push
-- name: Prepare baseline execution environment config
-- name: Build baseline execution environment image
-- name: Push baseline execution environment image
+- name: Prepare Baseline Execution Environment config
+- name: Build Baseline Execution Environment image
+- name: Push Baseline Execution Environment image
 
 See: https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml#L26-L56
 ### Github Action Azure EE Prep, Build, Push
-- name: Prepare Azure execution environment config
-- name: Build azure execution environment image
-- name: Push Azure execution environment image
+- name: Prepare Azure Execution Environment config
+- name: Build Azure Execution Environment image
+- name: Push Azure Execution Environment image
 
 See: https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml#L26-L56
 ## Azure OIDC Preparation for Github Actions
