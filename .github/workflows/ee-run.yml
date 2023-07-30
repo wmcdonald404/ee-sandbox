@@ -50,6 +50,12 @@ jobs:
           EOF
           cat ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/project/playbook.yml
 
+      - name: Construct & check the command line arguments
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/env/
+          echo '-k' > ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/env/cmdline
+          cat ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/env/cmdline
+
       - name: Set the credentials for ansible-runner
         run: |
           mkdir -p ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/env
