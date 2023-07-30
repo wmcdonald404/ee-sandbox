@@ -1,14 +1,17 @@
 # ee-sandbox
-Messing about with Ansible Execution Environments and Github Actions. 
+Messing about with Ansible Execution Environments and Github Actions. First we'll walk through the manual steps, end-to-end, to understand the process to automate. Then we'll demonstrate the same workflow but in an automated Github Actions workflow.  
 
-This is intended to outline the process to:
-1. Prepare an environment to run `ansible-builder` in order to...
-2. First build a baseline execution environment (EE) with the bare minimum `ansible-core` and `ansible-runner` and then...
-3. Then build an Azure-specific EE on top of that baseline, with the `azure.azcollection` and `azure-cli` in order to provide a suitable environment for `ansible-runner` targeting Azure 
-4. Test `ansible-runner` invoking the execution environment
-5. Wrap the process into a Github actions (GHA) pipeline
+This is will document the process to:
+1. Manually prepare a demonstration environment to run `ansible-builder`
+2. Manually build a baseline execution environment (EE) with the bare minimum `ansible-core` and `ansible-runner`
+3. Push the resultant container image to a container registry
+4. Wrap the preceding steps in a Github Action workflow
+5. Extend the Github Action workflow to build an Azure-specific EE on top of that baseline EE, with the `azure.azcollection` and `azure-cli`. Providing a suitable environment for `ansible-runner` to target Azure 
 
-First we'll walk through the manual steps, end-to-end, to understand the process to automate. Then we'll demonstrate the same workflow but in an automated GHA pipeline.  
+Once a base EE workflow has been built and tested next we will outline the process to:
+1. Configure Azure federated credentials to allow Github Actions authentication to Azure using OIDC
+2. Test `ansible-runner` invoking the Azure EE execution environment
+
 ## Ubuntu Setup
 First setup a build environment. This is running on Ubuntu 22.04 running on WSL2 for convenience, but should be easily modifiable for other environments. `ansible-builder` requires an RPM-based container image like Fedora, CentOS Stream or RHEL UBI in order to build its EEs.
 - Update the apt cache
@@ -50,8 +53,7 @@ $ podman pull registry.fedoraproject.org/fedora:38
 $ podman run --rm -it --name fedora-demo fedora:38
 ```
 (If running the container with `-dit`, `podman attach <container-id>`, CTRL-P, CTRL-Q to detach and leave running if needed.)
-
-## Manual Baseline Execution Environment Preparation
+## Manual Baseline Execution Environment Preparation & Build
 These manual steps are now baked into the pipeline in .github/workflows/ee-deploy.yml and will execute self-contained in the Github Action runner when triggered.
 
 - Set the initial environment variables
@@ -123,15 +125,24 @@ ansible.builtin.apt_repository         Add and remove APT repositories
 ```
 Note that only ansible.builtin core modules are currently installed. The execution environment will need additional collections to be more useful.
 At this stage, we can push the build container image to a registry, or build on top of it with additional collections to create purpose-specific execution environments (Azure, AWS, or GCP specific EEs, for example.)
-## Github Action Baseline Execution Environment Preparation
-Now we understand the manual process, we can wrap this into a Github Actions workflow. [The workflow](https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml) currently runs a job 'ee-build' which includes the steps below:
+
+
+## Github Action Execution Environments Preparation & Build
+Now we understand the manual process, we can wrap this into a Github Actions workflow. [The workflow](https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml) currently runs a job 'ee-build' which can be broken down into:
+### Github Action Common Preamble & Prerequisites
+- name: Log in to registry
 - name: Install ansible-builder python requirements
+See: https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml#L18-L24
+### Github Action Baseline EE Prep, Build, Push
 - name: Prepare baseline execution environment config
 - name: Build baseline execution environment image
 - name: Push baseline execution environment image
+See: https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml#L26-L56
+### Github Action Azure EE Prep, Build, Push
 - name: Prepare Azure execution environment config
 - name: Build azure execution environment image
 - name: Push Azure execution environment image
+See: https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-build.yml#L26-L56
 ## Azure OIDC Preparation for Github Actions
 ### Create an Azure AD Application and Service Principal
 - Log in to Azure
@@ -201,6 +212,7 @@ gh secret set AZURE_CLIENT_ID -e test -a actions -b <client-id>
 gh secret set AZURE_TENANT_ID -e test -a actions -b <app-tenant-id>
 gh secret set AZURE_SUBSCRIPTION_ID -e test -a actions -b <subscription-id>
 ```
+
 # References
 ## Execution Environment References
 - https://ansible.readthedocs.io/projects/navigator/installation/#requirements-windows
