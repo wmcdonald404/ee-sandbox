@@ -19,7 +19,7 @@ jobs:
     environment: test
 
     steps:  
-      - name: Log into Azure
+      - name: Log in to Azure
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
