@@ -212,7 +212,6 @@ $ gh secret set AZURE_CLIENT_ID -e test -a actions -b <client-id>
 $ gh secret set AZURE_TENANT_ID -e test -a actions -b <app-tenant-id>
 $ gh secret set AZURE_SUBSCRIPTION_ID -e test -a actions -b <subscription-id>
 ```
-
 ## Running Github Actions
 - List the Github Actions workflows
 ```
@@ -244,6 +243,10 @@ gh run view
 gh run view --job=<job-id>
 gh run view --job=<job-id> --log
 ```
+## Configuring VM authentication
+ gh secret set OS_USERNAME -e test -a actions -b <username>
+ gh secret set OS_PASSWORD -e test -a actions -b <password>
+ 
 
 # References
 ## Execution Environment References
