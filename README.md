@@ -147,41 +147,41 @@ See: https://github.com/wmcdonald404/ee-sandbox/blob/main/.github/workflows/ee-b
 ### Create an Azure AD Application and Service Principal
 - Log in to Azure
 ```
-az login
+$ az login
 ```
 - Set a default subscription
 ```
-az account set -s <subscription-id>
+$ az account set -s <subscription-id>
 ```
 - Create an Azure AD application registration
 ```
-az ad app create --display-name aad-app-github-actions-oidc
+$ az ad app create --display-name aad-app-github-actions-oidc
 ```
 ***Note*** the "appId" returned in the JSON as your `<app-client-id>`
 
 ***Note*** the "id" returned in the JSON as your `<app-object-id>`
 - Create a service principal for the Azure AD application
 ```
-az ad sp create --id <app-client-id>
+$ az ad sp create --id <app-client-id>
 ```
 ***Note*** the "id" returned in the JSON as your `<sp-id>`
 
 ***Note*** the "appOwnerOrganizationId" as your `<tenant-id>`
 - Assign the contributor role to the service principal for the subscription
 ```
-az role assignment create --role contributor --subscription <subscription-id> --assignee-object-id  <sp-id> --assignee-principal-type ServicePrincipal --scope /subscriptions/<subscription-id>
+$ az role assignment create --role contributor --subscription <subscription-id> --assignee-object-id  <sp-id> --assignee-principal-type ServicePrincipal --scope /subscriptions/<subscription-id>
 ```
 ***Note*** the upstream example demonstrates limiting the scope for this role to a specific resource group
 ### Add Federated Credentials
 - Set some temporary environment variables
 ```
-export APPLICATION-OBJECT-ID=<app-object-id>
-export CRED_NAME=aad-app-github-actions-oidc-fcred
-export SUBJECT=repo:wmcdonald404/ee-sandbox:environment:test
+$ export APPLICATION-OBJECT-ID=<app-object-id>
+$ export CRED_NAME=aad-app-github-actions-oidc-fcred
+$ export SUBJECT=repo:wmcdonald404/ee-sandbox:environment:test
 ```
 - Create JSON for the federated credential creation parameters
 ```
-cat > ~/credentials.json <<EOF
+$ cat > ~/credentials.json <<EOF
 {
     "name": "${CRED_NAME}",
     "issuer": "https://token.actions.githubusercontent.com",
@@ -195,22 +195,54 @@ EOF
 ```
 - Create the federated credential
 ```
-az ad app federated-credential create --id <app-object-id> --parameters credential.json
+$ az ad app federated-credential create --id <app-object-id> --parameters credential.json
 ```
 ### Create Github Environment & Secrets
 - Set the default repository for the Github CLI
 ```
-export GH_REPO=wmcdonald404/ee-sandbox
+$ export GH_REPO=wmcdonald404/ee-sandbox
 ```
 - Create the test Github deployment environment
 ```
-gh api -X PUT /repos/wmcdonald404/ee-sandbox/environments/test 
+$ gh api -X PUT /repos/wmcdonald404/ee-sandbox/environments/test 
 ```
 - Create the secrets needed for OIDC-based authentication
 ```
-gh secret set AZURE_CLIENT_ID -e test -a actions -b <client-id>
-gh secret set AZURE_TENANT_ID -e test -a actions -b <app-tenant-id>
-gh secret set AZURE_SUBSCRIPTION_ID -e test -a actions -b <subscription-id>
+$ gh secret set AZURE_CLIENT_ID -e test -a actions -b <client-id>
+$ gh secret set AZURE_TENANT_ID -e test -a actions -b <app-tenant-id>
+$ gh secret set AZURE_SUBSCRIPTION_ID -e test -a actions -b <subscription-id>
+```
+
+## Running Github Actions
+- List the Github Actions workflows
+```
+$ export GH_REPO=wmcdonald404/ee-sandbox
+$ gh workflow list
+Build Ansible Execution Environments  active  64655926
+Run Ansible execution environment     active  64655927
+```
+- View the details of a workflow
+```
+$ gh workflow view 64655927
+Run Ansible execution environment - ee-run.yml
+ID: 64655927
+```
+- Run a workflow (either of the following are synonymous)
+```
+$ gh workflow run ee-run.yml
+$ gh workflow run 64655927
+```
+- Watch the workflow execute
+  - `gh run watch` will automatically watch the most recent run
+  - `gh run list` and then `gh run watch <run-id>` will watch a specific run
+```
+gh run watch
+```
+- View the detailed output of the run
+```
+gh run view
+gh run view --job=<job-id>
+gh run view --job=<job-id> --log
 ```
 
 # References
