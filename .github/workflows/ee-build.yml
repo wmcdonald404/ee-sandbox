@@ -12,8 +12,6 @@ jobs:
   ee-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY_URL} -u $ --password-stdin
 
