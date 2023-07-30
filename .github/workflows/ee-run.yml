@@ -43,14 +43,25 @@ jobs:
           cat > ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/project/playbook.yml <<EOF
           - name: Testing Ansible SSH connectivity
             hosts: all
-
+            remote_user: ${{ secrets.OS_USERNAME }}
             tasks:
               - name: Ping the thing!
                 ping:  
           EOF
+          cat ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/project/playbook.yml
+
+      - name: Set the credentials for ansible-runner
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/env
+          mkfifo ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/env/passwords
+          cat <<EOF > ${GITHUB_WORKSPACE}/${MACHINE_ROLE}/env/passwords &
+          ---
+          "^SSH password:\\s*?$": "${{ secrets.OS_PASSWORD }}"
+          "^BECOME password.*:\\s*?$": "${{ secrets.OS_PASSWORD }}"
+          EOF
 
       - name: Test run the Azure execution environment image
         run: |
+          docker run --rm -u root -v ${PWD}/${MACHINE_ROLE}:/runner -v /home/runner/.azure/:/root/.azure/ -e RUNNER_PLAYBOOK=playbook.yml -e ANSIBLE_INVENTORY=/runner/inventory ${CONTAINER_REGISTRY_URL}/ansible/${EE_AZURE_IMAGE_NAME} ansible-runner run /runner
           docker run --rm -u root -v ${GITHUB_WORKSPACE}/${MACHINE_ROLE}:/runner -v /home/runner/.azure/:/root/.azure/ -e RUNNER_PLAYBOOK=playbook.yml -e ANSIBLE_INVENTORY=/runner/inventory ${CONTAINER_REGISTRY_URL}/${GITHUB_ACTOR}/${EE_AZURE_IMAGE_NAME} ansible-inventory --graph
       
-      # docker run --rm -u root -v ${PWD}/${MACHINE_ROLE}:/runner -v /home/runner/.azure/:/root/.azure/ -e RUNNER_PLAYBOOK=playbook.yml -e ANSIBLE_INVENTORY=/runner/inventory ${CONTAINER_REGISTRY_URL}/ansible/${EE_AZURE_IMAGE_NAME} ansible-runner run /runner
