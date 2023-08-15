@@ -14,7 +14,8 @@ env:
   MACHINE_ROLE: testvm
 
 jobs:
-  debug-job:
+  deploy-stuff:
+    if: ${{ vars.DEPLOY_STUFF }} == 'true'
     runs-on: ubuntu-latest
     environment: test
 
