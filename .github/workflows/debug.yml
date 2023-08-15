@@ -15,7 +15,7 @@ env:
 
 jobs:
   deploy-stuff:
-    if: vars.DEPLOY_STUFF
+    # if: vars.DEPLOY_STUFF
     runs-on: ubuntu-latest
     environment: test
 
