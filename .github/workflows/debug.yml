@@ -10,7 +10,7 @@ permissions:
 jobs:
   deploy-stuff:
     name: deploy-stuff
-    if: ${{ vars.DEPLOY_STUFF == true }}
+    if: vars.DEPLOY_STUFF == 'yeah'
     runs-on: ubuntu-latest
     environment: test
     steps:        
