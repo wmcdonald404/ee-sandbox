@@ -15,7 +15,7 @@ env:
 
 jobs:
   deploy-stuff:
-    if: ${{ vars.DEPLOY_STUFF }} == 'true'
+    if: vars.DEPLOY_STUFF
     runs-on: ubuntu-latest
     environment: test
 
@@ -30,6 +30,23 @@ jobs:
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY_URL} -u $ --password-stdin
       
-      - name: Construct & check the inventory
+      - name: Run a simple step 1
         run: |
           echo ${{ vars.DEPLOY_STUFF }}
+      
+      - name: Run a simple step 2
+        if: vars.DEPLOY_STUFF
+        run: |
+          echo ${{ vars.DEPLOY_STUFF }}
+
+      - name: Run a simple step 3
+        if: vars.DEPLOY_STUFF == 'true'
+        run: |
+          echo ${{ vars.DEPLOY_STUFF }}
+
+      - name: Run a simple step 4
+        if: ${{ vars.DEPLOY_STUFF }} == 'true'
+        run: |
+          echo ${{ vars.DEPLOY_STUFF }}
+
+          
