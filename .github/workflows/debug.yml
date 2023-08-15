@@ -21,23 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     steps:  
-      - name: Run a simple step 2
-        if: vars.DEPLOY_STUFF
-        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
-      #3 evalulates as string (true && ('true' == 'true')) == true 
       - name: Run a simple step 3
-        if: vars.DEPLOY_STUFF == 'true'
-        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
-      #4 evaluates as boolean (true && ('true' == true)) == false
-      - name: Run a simple step 4
-        if: vars.DEPLOY_STUFF == true
-        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
-      - name: Run a simple step 5
-        if: ${{ vars.DEPLOY_STUFF }}
-        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
-      - name: Run a simple step 6
-        if: ${{ vars.DEPLOY_STUFF }} == true
-        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
-      - name: Run a simple step 7
-        if: ${{ vars.DEPLOY_STUFF }} == 'true'
+        if: vars.DEPLOY_STUFF == 'yeah'
         run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
