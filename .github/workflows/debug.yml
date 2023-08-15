@@ -1,4 +1,4 @@
-name: Run Ansible execution environment
+name: Debug workflow for experimentation
 
 on: 
     workflow_dispatch
