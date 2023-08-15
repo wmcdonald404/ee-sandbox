@@ -14,7 +14,7 @@ env:
   MACHINE_ROLE: testvm
 
 jobs:
-  ee-run:
+  debug-job:
     runs-on: ubuntu-latest
     environment: test
 
