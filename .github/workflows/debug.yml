@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   run-job-if-true:
-    if: vars.DEPLOY_STUFF
+    if: vars.DEPLOY_STUFF == true
     runs-on: ubuntu-latest
     environment: test
     steps:        
@@ -23,8 +23,7 @@ jobs:
     environment: test
     steps:  
       - name: Run a simple step 1
-        run: |
-          echo ${{ vars.DEPLOY_STUFF }}
+        run: echo ${{ vars.DEPLOY_STUFF }}
       - name: Run a simple step 2
         if: vars.DEPLOY_STUFF
         run: echo step 2
