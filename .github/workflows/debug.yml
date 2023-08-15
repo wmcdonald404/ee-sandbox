@@ -7,32 +7,18 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  CONTAINER_REGISTRY_URL: ghcr.io
-  EE_BASELINE_IMAGE_NAME: ee-baseline
-  EE_AZURE_IMAGE_NAME: ee-azure
-  MACHINE_ROLE: testvm
-
 jobs:
-  deploy-stuff-1:
+  run-job-if-true:
     if: vars.DEPLOY_STUFF
     runs-on: ubuntu-latest
     environment: test
     steps:        
       - name: Run a simple step 1
-        run: |
-          echo ${{ vars.DEPLOY_STUFF }}
+        run: echo step 1
       - name: Run a simple step 2
-        if: vars.DEPLOY_STUFF
         run: echo step 2
-      - name: Run a simple step 3
-        if: vars.DEPLOY_STUFF == 'true'
-        run: echo step 3
-      - name: Run a simple step 4
-        if: ${{ vars.DEPLOY_STUFF }} == 'true'
-        run: echo step 4
 
-  deploy-stuff-2:
+  run-steps-if-true:
     runs-on: ubuntu-latest
     environment: test
     steps:  
@@ -46,5 +32,8 @@ jobs:
         if: vars.DEPLOY_STUFF == 'true'
         run: echo step 3
       - name: Run a simple step 4
-        if: ${{ vars.DEPLOY_STUFF }} == 'true'
+        if: ${{ vars.DEPLOY_STUFF }} == true
         run: echo step 4
+      - name: Run a simple step 5
+        if: ${{ vars.DEPLOY_STUFF }} == 'true'
+        run: echo step 5
