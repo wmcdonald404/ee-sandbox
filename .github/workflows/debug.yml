@@ -32,4 +32,4 @@ jobs:
       
       - name: Construct & check the inventory
         run: |
-          echo "Do some stuff here"
+          echo ${{ vars.DEPLOY_STUFF }}
