@@ -24,16 +24,13 @@ jobs:
           echo ${{ vars.DEPLOY_STUFF }}
       - name: Run a simple step 2
         if: vars.DEPLOY_STUFF
-        run: |
-          echo ${{ vars.DEPLOY_STUFF }}
+        run: echo step 2
       - name: Run a simple step 3
         if: vars.DEPLOY_STUFF == 'true'
-        run: |
-          echo ${{ vars.DEPLOY_STUFF }}
+        run: echo step 3
       - name: Run a simple step 4
         if: ${{ vars.DEPLOY_STUFF }} == 'true'
-        run: |
-          echo ${{ vars.DEPLOY_STUFF }}
+        run: echo step 4
 
   deploy-stuff-2:
     runs-on: ubuntu-latest
@@ -44,13 +41,10 @@ jobs:
           echo ${{ vars.DEPLOY_STUFF }}
       - name: Run a simple step 2
         if: vars.DEPLOY_STUFF
-        run: |
-          echo ${{ vars.DEPLOY_STUFF }}
+        run: echo step 2
       - name: Run a simple step 3
         if: vars.DEPLOY_STUFF == 'true'
-        run: |
-          echo ${{ vars.DEPLOY_STUFF }}
+        run: echo step 3
       - name: Run a simple step 4
         if: ${{ vars.DEPLOY_STUFF }} == 'true'
-        run: |
-          echo ${{ vars.DEPLOY_STUFF }}
+        run: echo step 4
