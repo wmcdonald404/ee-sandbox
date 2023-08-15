@@ -9,14 +9,12 @@ permissions:
 
 jobs:
   run-job-if-true:
-    if: vars.DEPLOY_STUFF == true
+    if: ${{ vars.DEPLOY_STUFF == 'true' }}
     runs-on: ubuntu-latest
     environment: test
     steps:        
       - name: Run a simple step 1
-        run: echo step 1
-      - name: Run a simple step 2
-        run: echo step 2
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
 
   run-steps-if-true:
     runs-on: ubuntu-latest
@@ -26,19 +24,19 @@ jobs:
         run: echo ${{ vars.DEPLOY_STUFF }}
       - name: Run a simple step 2
         if: vars.DEPLOY_STUFF
-        run: echo step 2
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
       - name: Run a simple step 3
         if: vars.DEPLOY_STUFF == 'true'
-        run: echo step 3
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
       - name: Run a simple step 4
         if: vars.DEPLOY_STUFF == true
-        run: echo step 4
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
       - name: Run a simple step 5
         if: ${{ vars.DEPLOY_STUFF }}
-        run: echo step 5
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
       - name: Run a simple step 6
         if: ${{ vars.DEPLOY_STUFF }} == true
-        run: echo step 6
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
       - name: Run a simple step 7
         if: ${{ vars.DEPLOY_STUFF }} == 'true'
-        run: echo step 7
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
