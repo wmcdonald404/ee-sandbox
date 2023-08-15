@@ -10,9 +10,9 @@ permissions:
 jobs:
   deploy-stuff:
     name: deploy-stuff
+    if: vars.DEPLOY_STUFF == true
     runs-on: ubuntu-latest
     environment: test
-    if: ${{ vars.DEPLOY_STUFF == 'true' }}
     steps:        
       - name: Run a simple step 1
         run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
@@ -21,14 +21,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     steps:  
-      - name: Run a simple step 1
-        run: echo ${{ vars.DEPLOY_STUFF }}
       - name: Run a simple step 2
         if: vars.DEPLOY_STUFF
         run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
+      #3 evalulates as string (true && ('true' == 'true')) == true 
       - name: Run a simple step 3
         if: vars.DEPLOY_STUFF == 'true'
         run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
+      #4 evaluates as boolean (true && ('true' == true)) == false
       - name: Run a simple step 4
         if: vars.DEPLOY_STUFF == true
         run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
