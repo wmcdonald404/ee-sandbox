@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   run-job-if-true:
-    if: vars.DEPLOY_STUFF == true
+    if: vars.DEPLOY_STUFF == 'true'
     runs-on: ubuntu-latest
     environment: test
     steps:        
