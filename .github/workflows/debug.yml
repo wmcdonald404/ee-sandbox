@@ -35,8 +35,11 @@ jobs:
         if: vars.DEPLOY_STUFF == true
         run: echo step 4
       - name: Run a simple step 5
-        if: ${{ vars.DEPLOY_STUFF }} == true
+        if: ${{ vars.DEPLOY_STUFF }}
         run: echo step 5
       - name: Run a simple step 6
-        if: ${{ vars.DEPLOY_STUFF }} == 'true'
+        if: ${{ vars.DEPLOY_STUFF }} == true
         run: echo step 6
+      - name: Run a simple step 7
+        if: ${{ vars.DEPLOY_STUFF }} == 'true'
+        run: echo step 7
