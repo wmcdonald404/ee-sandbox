@@ -7,6 +7,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  TOGGLE_STUFF: yes
+
 jobs:
   deploy-stuff:
     name: deploy-stuff
@@ -15,7 +18,7 @@ jobs:
     environment: test
     steps:        
       - name: Run a simple step 1
-        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF }}
 
   run-steps-if-true:
     runs-on: ubuntu-latest
@@ -23,4 +26,30 @@ jobs:
     steps:  
       - name: Run a simple step 3
         if: vars.DEPLOY_STUFF == 'yeah'
-        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF}}
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF }}
+  
+  toggle-stuff-yes:
+    name: toggle-stuff
+    if: env.TOGGLE_STUFF == 'yes'
+    runs-on: ubuntu-latest
+    environment: test
+    steps:        
+      - name: Run a simple step 1
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF }}
+
+  toggle-stuff-no:
+    name: toggle-stuff
+    if: env.TOGGLE_STUFF == 'no'
+    runs-on: ubuntu-latest
+    environment: test
+    steps:        
+      - name: Run a simple step 1
+        run: echo "vars.DEPLOY_STUFF:" ${{ env.TOGGLE_STUFF}}
+
+  run-steps-if-true:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:  
+      - name: Run a simple step 3
+        if: env.TOGGLE_STUFF == 'yes'
+        run: echo "env.TOGGLE_STUFF:" ${{ env.TOGGLE_STUFF }}
