@@ -25,6 +25,6 @@ jobs:
     environment: test
     steps:  
       - name: Run a simple step 3
-        if: vars.DEPLOY_STUFF == 'yeah'
+        if: vars.DEPLOY_STUFF == 'nah'
         run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF }}
 
