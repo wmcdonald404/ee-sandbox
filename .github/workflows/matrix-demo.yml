@@ -1,0 +1,39 @@
+name: Workflow demonstrating matrix usage
+
+on: 
+    workflow_dispatch
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  set-vars:
+    environment: test
+    runs-on: ubuntu-latest
+    outputs:
+      testvms: ${{ steps.setvms.outputs.vms }}
+    steps:      
+      - name: set the VM list for subsequent jobs
+        id: setvms
+        run: echo 'vms=${{ vars.VMS }}' >> $GITHUB_OUTPUT
+      
+  env-debug:
+    needs: [set-vars]
+    environment: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: print inputs
+        run: echo ${{ needs.set-vars.outputs.testvms }}
+            
+  env-matrix:
+    needs: [set-vars]
+    environment: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.set-vars.outputs.testvms) }}
+    steps:
+      - name: run over the matrix list
+        run: |
+          echo ${{ matrix.vms.name }}
+          echo ${{ matrix.vms.az }}
