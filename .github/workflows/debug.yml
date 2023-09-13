@@ -20,7 +20,7 @@ jobs:
       - name: set the VM list for subsequent jobs
         id: setvms
         run: |
-          echo ${{ env.ENV_VMS }}
+          echo ${{ env.ENV_VMS }} >> "$GITHUB_OUTPUT"
 
   static-matrix:
     strategy:
@@ -43,26 +43,6 @@ jobs:
       - name: run over the matrix list
         run: |
           echo ${{ matrix.vmlist }}
-            
-  vars-matrix:
-    environment: test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        vmlist: ${{ vars.VMS }}
-    steps:
-      - name: run over the matrix list
-        run: |
-          echo ${{ matrix.vmlist }}
-            
-  deploy-stuff:
-    name: deploy-stuff
-    if: vars.DEPLOY_STUFF == 'yes'
-    runs-on: ubuntu-latest
-    environment: test
-    steps:        
-      - name: Run a simple step 1
-        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF }}
 
   run-steps-if-true:
     runs-on: ubuntu-latest
