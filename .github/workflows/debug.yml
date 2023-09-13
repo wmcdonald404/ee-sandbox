@@ -16,8 +16,7 @@ jobs:
     steps:      
       - name: set the VM list for subsequent jobs
         id: setvms
-        run: |
-          echo 'vms=${{ vars.VMS }}' >> $GITHUB_OUTPUT
+        run: echo 'vms=${{ vars.VMS }}' >> $GITHUB_OUTPUT
       
   env-debug:
     needs: [set-vars]
@@ -25,8 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: print inputs
-        run: |
-          echo ${{ needs.set-vars.outputs.testvms }}
+        run: echo ${{ needs.set-vars.outputs.testvms }}
             
   env-matrix:
     needs: [set-vars]
@@ -40,21 +38,11 @@ jobs:
           echo ${{ matrix.vms.name }}
           echo ${{ matrix.vms.az }}
 
-  # static-matrix:
-  #   strategy:
-  #     matrix:
-  #       vmlist: [vm1, vm2, vm3]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: run over the matrix list
-  #       run: |
-  #         echo ${{ matrix.vmlist }}
-
-  # run-steps-if-true:
-  #   runs-on: ubuntu-latest
-  #   environment: test
-  #   steps:  
-  #     - name: Run a simple step 3
-  #       if: vars.DEPLOY_STUFF == 'yes'
-  #       run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF }}
+  run-steps-if-true:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:  
+      - name: Run a simple step 3
+        if: vars.DEPLOY_STUFF == 'yes'
+        run: echo "vars.DEPLOY_STUFF:" ${{ vars.DEPLOY_STUFF }}
 
