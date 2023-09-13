@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 env:
-  ENV_VMS: '["vm1", "vm2", "vm3"]'
+  ENV_VMS: [vm1, vm2, vm3]
 
 jobs:
   set-vars:
@@ -21,8 +21,7 @@ jobs:
         id: setvms
         run: |
           echo "vms=${{ env.ENV_VMS }}" >> "$GITHUB_OUTPUT"
-
-            
+      
   env-debug:
     needs: [set-vars]
     environment: test
@@ -31,6 +30,8 @@ jobs:
       - name: print inputs
         run: |
           echo ${{ needs.set-vars.outputs.testvms }}
+          echo ${{ fromJson(needs.set-vars.outputs.testvms) }}
+          echo ${{ toJson(needs.set-vars.outputs.testvms) }}
             
   env-matrix:
     needs: [set-vars]
@@ -38,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vmlist: ${{ fromJson(needs.set-vars.outputs.testvms) }}
+        vmlist: ${{ needs.set-vars.outputs.testvms }}
     steps:
       - name: run over the matrix list
         run: |
