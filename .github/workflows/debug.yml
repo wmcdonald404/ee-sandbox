@@ -41,17 +41,17 @@ jobs:
         run: |
           echo ${{ needs.set-vars.outputs.testvms }}
             
-  # env-matrix:
-  #   needs: [set-vars]
-  #   environment: test
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       vmlist: ${{ fromJson(needs.set-vars.outputs.testvms) }}
-  #   steps:
-  #     - name: run over the matrix list
-  #       run: |
-  #         echo ${{ matrix.vmlist }}
+  env-matrix:
+    needs: [set-vars]
+    environment: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vmlist: ${{ needs.set-vars.outputs.testvms }}
+    steps:
+      - name: run over the matrix list
+        run: |
+          echo ${{ matrix.vmlist }}
 
   run-steps-if-true:
     runs-on: ubuntu-latest
