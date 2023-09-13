@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vmlist: ${{ fromJson(needs.set-vars.outputs.testvms) }}
+        vmlist: ${{ needs.set-vars.outputs.testvms }}
     steps:
       - name: run over the matrix list
         run: |
