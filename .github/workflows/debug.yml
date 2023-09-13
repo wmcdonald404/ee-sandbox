@@ -30,7 +30,7 @@ jobs:
       - name: print inputs
         run: |
           echo ${{ needs.set-vars.outputs.testvms }}
-      # echo ${{ fromJson(needs.set-vars.outputs.testvms) }}
+          echo ${{ fromJson(needs.set-vars.outputs.testvms) }}
       # echo ${{ toJson(needs.set-vars.outputs.testvms) }}
             
   # env-matrix:
