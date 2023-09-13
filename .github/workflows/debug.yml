@@ -7,9 +7,6 @@ permissions:
   id-token: write
   contents: read
 
-# env:
-#   ENV_VMS: "vm1, vm2, vm3"
-
 jobs:
   set-vars:
     environment: test
@@ -30,7 +27,6 @@ jobs:
       - name: print inputs
         run: |
           echo ${{ needs.set-vars.outputs.testvms }}
-      # echo ${{ toJson(needs.set-vars.outputs.testvms) }}
             
   env-matrix:
     needs: [set-vars]
@@ -41,7 +37,8 @@ jobs:
     steps:
       - name: run over the matrix list
         run: |
-          echo ${{ matrix.vms }}
+          echo ${{ matrix.vms.name }}
+          echo ${{ matrix.vms.az }}
 
   # static-matrix:
   #   strategy:
