@@ -20,7 +20,7 @@ jobs:
       - name: set the VM list for subsequent jobs
         id: setvms
         run: |
-          echo 'vms=${{ toJson(vars.VMS) }}' >> $GITHUB_OUTPUT
+          echo 'vms=${{ vars.VMS }}' >> $GITHUB_OUTPUT
       
   env-debug:
     needs: [set-vars]
