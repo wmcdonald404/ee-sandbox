@@ -1,0 +1,15 @@
+name: Called workflow demonstrating reusable workflows
+
+on: 
+  workflow_call
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  do-stuff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check variable scope
+        run: echo ${{ env.testvar }}

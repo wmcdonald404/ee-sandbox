@@ -1,0 +1,15 @@
+name: Calling workflow demonstrating reusable workflows
+
+on: 
+  workflow_dispatch
+
+env:
+  testvar: from caller
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  call-reusable-workflow:
+    uses: ./.github/workflows/reusable-called.yml

@@ -17,15 +17,7 @@ jobs:
       - name: set the VM list for subsequent jobs
         id: setvms
         run: echo 'vms=${{ vars.VMS }}' >> $GITHUB_OUTPUT
-      
-  env-debug:
-    needs: [set-vars]
-    environment: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: print inputs
-        run: echo ${{ needs.set-vars.outputs.testvms }}
-            
+
   env-matrix:
     needs: [set-vars]
     environment: test
@@ -33,6 +25,8 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.set-vars.outputs.testvms) }}
     steps:
+      - name: print inputs
+        run: echo ${{ needs.set-vars.outputs.testvms }}
       - name: run over the matrix list
         run: |
           echo ${{ matrix.vms.name }}
