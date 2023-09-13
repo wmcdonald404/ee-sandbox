@@ -20,7 +20,7 @@ jobs:
       - name: set the VM list for subsequent jobs
         id: setvms
         run: |
-          echo 'vms=[vm1, vm2]' >> $GITHUB_OUTPUT
+          echo 'vms={"vms":["vm1", "vm2"]}' >> $GITHUB_OUTPUT
       
   env-debug:
     needs: [set-vars]
@@ -37,12 +37,11 @@ jobs:
     environment: test
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        vmlist: ${{ needs.set-vars.outputs.testvms }}
+      matrix: ${{ fromJson(needs.set-vars.outputs.testvms) }}
     steps:
       - name: run over the matrix list
         run: |
-          echo ${{ matrix.vmlist }}
+          echo ${{ matrix.vms }}
 
   # static-matrix:
   #   strategy:
