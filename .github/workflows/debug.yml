@@ -8,6 +8,27 @@ permissions:
   contents: read
 
 jobs:
+  static_matrix:
+    strategy:
+      matrix:
+        vmlist: [vm1, vm2, vm3]
+    runs-on: ubuntu-latest
+    steps:
+      - name: run over the matrix list
+        run: |
+          echo ${{ matrix.vmlist }}
+            
+  vars_matrix:
+    environment: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vmlist: ${{ vars.VMS }}
+    steps:
+      - name: run over the matrix list
+        run: |
+          echo ${{ matrix.vmlist }}
+            
   deploy-stuff:
     name: deploy-stuff
     if: vars.DEPLOY_STUFF == 'yes'
