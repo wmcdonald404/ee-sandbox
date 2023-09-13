@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 env:
-  ENV_VMS: "[vm1, vm2, vm3]"
+  ENV_VMS: '["vm1", "vm2", "vm3"]'
 
 jobs:
   set-vars:
