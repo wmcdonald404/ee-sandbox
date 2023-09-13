@@ -9,8 +9,20 @@ permissions:
 
 env:
   ENV_VMS: "[vm1, vm2, vm3]"
+
 jobs:
-  static_matrix:
+  set-vars:
+    environment: test
+    runs-on: ubuntu-latest
+    outputs:
+      testvms: ${{ steps.setvms.outputs.vms }}
+    steps:      
+      - name: set the VM list for subsequent jobs
+        id: setvms
+        run: |
+          echo ${{ env.ENV_VMS }}
+
+  static-matrix:
     strategy:
       matrix:
         vmlist: [vm1, vm2, vm3]
@@ -20,18 +32,19 @@ jobs:
         run: |
           echo ${{ matrix.vmlist }}
             
-  env_matrix:
+  env-matrix:
+    needs: [set-vars]
     environment: test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vmlist: ${{ env.VMS }}
+        vmlist: ${{ needs.set-vars.outputs.testvms }}
     steps:
       - name: run over the matrix list
         run: |
           echo ${{ matrix.vmlist }}
             
-  vars_matrix:
+  vars-matrix:
     environment: test
     runs-on: ubuntu-latest
     strategy:
