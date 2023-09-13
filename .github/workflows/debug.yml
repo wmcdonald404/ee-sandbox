@@ -7,12 +7,25 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  ENV_VMS: "[vm1, vm2, vm3]"
 jobs:
   static_matrix:
     strategy:
       matrix:
         vmlist: [vm1, vm2, vm3]
     runs-on: ubuntu-latest
+    steps:
+      - name: run over the matrix list
+        run: |
+          echo ${{ matrix.vmlist }}
+            
+  env_matrix:
+    environment: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vmlist: ${{ env.VMS }}
     steps:
       - name: run over the matrix list
         run: |
