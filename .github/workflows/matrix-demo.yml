@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  set-vars:
+  setvars:
     environment: test
     runs-on: ubuntu-latest
     outputs:
@@ -19,7 +19,7 @@ jobs:
         run: echo 'vms=${{ vars.VMS }}' >> $GITHUB_OUTPUT
 
   env-matrix:
-    needs: [set-vars]
+    needs: [setvars]
     environment: test
     runs-on: ubuntu-latest
     strategy:

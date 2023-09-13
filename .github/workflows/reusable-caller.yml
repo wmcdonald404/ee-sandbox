@@ -11,5 +11,18 @@ permissions:
   contents: read
 
 jobs:
+  # cf: https://github.com/orgs/community/discussions/26671
+  setvars:
+    runs-on: ubuntu-latest
+    outputs:
+      testvar: ${{ env.testvar }}
+    steps:      
+      - run: echo setting vars
+
   call-reusable-workflow:
+    needs: [setvars]
     uses: ./.github/workflows/reusable-called.yml
+    with:
+      passed-var: ${{ needs.setvars.outputs.testvar }}
+      
+

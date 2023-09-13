@@ -1,7 +1,11 @@
 name: Called workflow demonstrating reusable workflows
 
 on: 
-  workflow_call
+  workflow_call:
+    inputs:
+      passed-var:
+        required: true
+        type: string
 
 permissions:
   id-token: write
@@ -12,4 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: check variable scope
-        run: echo ${{ env.testvar }}
+        run: |
+          echo ${{ env.testvar }}
+          echo ${{ inputs.passed-var }}
+
