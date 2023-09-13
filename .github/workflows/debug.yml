@@ -20,7 +20,7 @@ jobs:
       - name: set the VM list for subsequent jobs
         id: setvms
         run: |
-          echo ${{ env.ENV_VMS }} >> "$GITHUB_OUTPUT"
+          echo "vms=${{ env.ENV_VMS }}" >> "$GITHUB_OUTPUT"
 
   static-matrix:
     strategy:
