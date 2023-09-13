@@ -17,6 +17,6 @@ jobs:
     steps:
       - name: check variable scope
         run: |
-          echo ${{ env.testvar }}
-          echo ${{ inputs.passed-var }}
+          echo testvar: ${{ env.testvar }}
+          echo passed-var: ${{ inputs.passed-var }}
 
