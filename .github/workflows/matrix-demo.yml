@@ -12,21 +12,24 @@ jobs:
     environment: test
     runs-on: ubuntu-latest
     outputs:
-      testvms: ${{ steps.setvms.outputs.vms }}
+      role1_vms: ${{ steps.setvms.outputs.role1_vms }}
+      role2_vms: ${{ steps.setvms.outputs.role2_vms }}
     steps:      
       - name: set the VM list for subsequent jobs
         id: setvms
-        run: echo 'vms=${{ vars.VMS }}' >> $GITHUB_OUTPUT
+        run: |
+          echo 'role1_vms=${{ vars.ROLE1_VMS }}' >> $GITHUB_OUTPUT
+          echo 'role2_vms=${{ vars.ROLE2_VMS }}' >> $GITHUB_OUTPUT
 
   env-matrix:
     needs: [setvars]
     environment: test
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.set-vars.outputs.testvms) }}
+      matrix: ${{ fromJson(needs.setvars.outputs.role1_vms) }}
     steps:
       - name: print inputs
-        run: echo ${{ needs.set-vars.outputs.testvms }}
+        run: echo ${{ needs.setvars.outputs.role1_vms }}
       - name: run over the matrix list
         run: |
           echo ${{ matrix.vms.name }}
